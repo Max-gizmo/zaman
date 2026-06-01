@@ -1297,15 +1297,25 @@ function MobileAssetsView({ lang = 'ru', dark = false, onAsset = () => {} }) {
 
       {/* List */}
       <div style={{ flex: 1, padding: '8px 20px 96px', overflowY: 'auto' }}>
-        {tab === 'portfolio' && (<>
-          {liveHoldings.map((h, i, arr) => (
-            <AssetRow key={h.symbol} {...h} sparkData={h.spark} priceCcy={h.ccy} last={i === arr.length - 1 && bybitHoldings.length === 0} dark={dark}
-              onClick={() => onAsset(h)}/>
-          ))}
-          {bybitHoldings.map((h, i, arr) => (
-            <AssetRow key={'bybit-' + h.symbol} {...h} priceCcy="$" last={i === arr.length - 1} dark={dark} badge="bybit live"/>
-          ))}
-        </>)}
+        {tab === 'portfolio' && (() => {
+          const ownHoldings = liveHoldings.filter(h => h.source !== 'bybit');
+          return (<>
+            {/* 4-column header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '2px 0 8px', fontSize: 10, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase', color: sub, borderBottom: border }}>
+              <div style={{ width: 34, flexShrink: 0 }}/>
+              <div style={{ flex: 1, minWidth: 0 }}>{lang === 'ru' ? 'Актив' : 'Asset'}</div>
+              <div style={{ width: 50, textAlign: 'right' }}>{lang === 'ru' ? 'Кол-во' : 'Qty'}</div>
+              <div style={{ width: 80, textAlign: 'right' }}>{lang === 'ru' ? 'Цена' : 'Price'}</div>
+              <div style={{ width: 72, textAlign: 'right' }}>{lang === 'ru' ? 'Стоимость' : 'Value'}</div>
+            </div>
+            {ownHoldings.map((h, i) => (
+              <AssetRow key={h.symbol} {...h} cols4 priceCcy={h.ccy} last={false} dark={dark} onClick={() => onAsset(h)}/>
+            ))}
+            {bybitHoldings.map((h, i, arr) => (
+              <AssetRow key={'bybit-' + h.symbol} {...h} cols4 priceCcy="$" last={i === arr.length - 1} dark={dark} badge="bybit live"/>
+            ))}
+          </>);
+        })()}
         {tab === 'orders' && (
           openOrders.length === 0
             ? <div style={{ textAlign: 'center', padding: '40px 0', color: sub, fontSize: 14 }}>{lang === 'ru' ? 'Нет активных приказов' : 'No open orders'}</div>

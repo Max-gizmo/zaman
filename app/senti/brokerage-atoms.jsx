@@ -670,10 +670,44 @@ function AllocationStrip({ segments, height = 12, gap = 3, showLabels = true, la
 // ──────────────────────────────────────────────────────────────
 // Asset row — used in holdings lists
 // ──────────────────────────────────────────────────────────────
-function AssetRow({ symbol, name, price, priceCcy = '$', change, sparkData, qty, dark = false, last = false, onClick, badge }) {
+function AssetRow({ symbol, name, price, priceCcy = '$', change, sparkData, qty, dark = false, last = false, onClick, badge, cols4 = false }) {
   const textCol = dark ? '#fff' : SC.ink1000;
   const subCol = dark ? 'rgba(255,255,255,0.5)' : SC.ink500;
   const border = dark ? 'rgba(255,255,255,0.07)' : SC.ink200;
+
+  // 4-column layout (mobile/phone Портфель): name+icon · qty · price+change · total value
+  if (cols4) {
+    const hasPrice = typeof price === 'number';
+    const tv = (qty != null && hasPrice) ? qty * price : null;
+    const qtyStr = qty == null ? '—'
+      : (qty % 1 === 0 ? qty : qty < 0.01 ? qty.toFixed(6) : qty < 1 ? qty.toFixed(4) : qty.toFixed(2));
+    return (
+      <div onClick={onClick} style={{
+        display: 'flex', alignItems: 'center', gap: 8, padding: '12px 0',
+        borderBottom: last ? 'none' : `1px solid ${border}`, cursor: onClick ? 'pointer' : 'default',
+      }}>
+        <TickerLogo symbol={symbol} size={34}/>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontWeight: 600, fontSize: 14, color: textCol, letterSpacing: '-0.2px' }}>
+            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{symbol}</span>
+            {badge && <span style={{ fontSize: 8, fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', background: 'rgba(12,71,183,0.15)', color: '#0C47B7', padding: '2px 4px', borderRadius: 4, flexShrink: 0 }}>{badge}</span>}
+          </div>
+          <div style={{ fontSize: 11, color: subCol, marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{name}</div>
+        </div>
+        <div style={{ width: 50, textAlign: 'right', fontFamily: SC.fontMono, fontSize: 12, color: subCol }}>{qtyStr}</div>
+        <div style={{ width: 80, textAlign: 'right' }}>
+          <div style={{ fontFamily: SC.fontMono, fontSize: 12.5, fontWeight: 600, color: textCol }}>
+            {hasPrice ? `${priceCcy}${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : (price || '—')}
+          </div>
+          <div style={{ marginTop: 2, display: 'flex', justifyContent: 'flex-end' }}><DeltaPill value={change} size="sm" mode="ghost"/></div>
+        </div>
+        <div style={{ width: 72, textAlign: 'right', fontFamily: SC.fontMono, fontSize: 13, fontWeight: 700, color: textCol }}>
+          {tv != null ? `${priceCcy}${tv.toLocaleString('en-US', { maximumFractionDigits: 0 })}` : '—'}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div onClick={onClick} style={{
       display: 'flex', alignItems: 'center', gap: 12, padding: '14px 0',

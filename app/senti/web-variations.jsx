@@ -497,9 +497,9 @@ function WebV1Green({ lang = 'ru', setLang = () => {}, onNav, active = 'home', o
     const usd = parseFloat(b.usdValue);
     return { symbol: b.asset, name: b.asset, qty, price: qty > 0 ? usd / qty : 0, ccy: '$', change: 0 };
   }), [bybitBals]);
-  const cashHoldings   = liveHoldings.filter(h => h.cls === 'cash');
+  const cashHoldings   = liveHoldings.filter(h => h.cls === 'cash' && h.source !== 'bybit');
   const kgHoldings     = liveHoldings.filter(h => h.cls === 'kg');
-  const cryptoHoldings = liveHoldings.filter(h => h.cls === 'crypto');
+  const cryptoHoldings = liveHoldings.filter(h => h.cls === 'crypto' && h.source !== 'bybit');
   const cfdHoldings    = liveHoldings.filter(h => h.cls === 'cfd');
   const STABLE_COINS = ['USDT','USDC','BUSD','DAI','TUSD'];
   const stableVarSegs1 = React.useMemo(() => {
@@ -830,9 +830,9 @@ function WebV2Minimal({ lang = 'ru', setLang = () => {}, onNav, active = 'home',
     const usd = parseFloat(b.usdValue);
     return { symbol: b.asset, name: b.asset, qty, price: qty > 0 ? usd / qty : 0, ccy: '$', change: 0 };
   }), [bybitBals]);
-  const cashHoldings   = liveHoldings.filter(h => h.cls === 'cash');
+  const cashHoldings   = liveHoldings.filter(h => h.cls === 'cash' && h.source !== 'bybit');
   const kgHoldings     = liveHoldings.filter(h => h.cls === 'kg');
-  const cryptoHoldings = liveHoldings.filter(h => h.cls === 'crypto');
+  const cryptoHoldings = liveHoldings.filter(h => h.cls === 'crypto' && h.source !== 'bybit');
   const cfdHoldings    = liveHoldings.filter(h => h.cls === 'cfd');
   const { orders: allRecords2, refetch: refetchHistory2 } = typeof useBybitHistory === 'function' ? useBybitHistory() : { orders: [], refetch: () => {} };
   const openOrders2   = React.useMemo(() => allRecords2.filter(r => r.recordType === 'open_order'), [allRecords2]);
@@ -1028,9 +1028,9 @@ function WebV3Dark({ lang = 'ru', setLang = () => {}, onNav, active = 'home', on
     const usd = parseFloat(b.usdValue);
     return { symbol: b.asset, name: b.asset, qty, price: qty > 0 ? usd / qty : 0, ccy: '$', change: 0 };
   }), [bybitBals]);
-  const cashHoldings   = liveHoldings.filter(h => h.cls === 'cash');
+  const cashHoldings   = liveHoldings.filter(h => h.cls === 'cash' && h.source !== 'bybit');
   const kgHoldings     = liveHoldings.filter(h => h.cls === 'kg');
-  const cryptoHoldings = liveHoldings.filter(h => h.cls === 'crypto');
+  const cryptoHoldings = liveHoldings.filter(h => h.cls === 'crypto' && h.source !== 'bybit');
   const cfdHoldings    = liveHoldings.filter(h => h.cls === 'cfd');
   const STABLE_COINS_3 = ['USDT','USDC','BUSD','DAI','TUSD'];
   const stableVarSegs3 = React.useMemo(() => {
