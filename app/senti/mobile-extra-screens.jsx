@@ -533,7 +533,7 @@ function TradeSheet({ side: initialSide, asset, lang = 'ru', onClose, onSubmit, 
       padding: '12px 20px 30px',
       display: 'flex', flexDirection: 'column', gap: 0,
       boxShadow: inline ? 'none' : '0 -8px 30px rgba(0,0,0,0.18)',
-      maxHeight: inline ? 'none' : '92vh', overflow: 'hidden',
+      maxHeight: inline ? 'none' : '100%', overflowX: 'hidden', overflowY: inline ? 'visible' : 'auto',
     }}>
       {/* grabber */}
       {!inline && <div style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.2)' : SC.ink200, marginBottom: 10 }}/>}
@@ -712,9 +712,9 @@ function TradeSheet({ side: initialSide, asset, lang = 'ru', onClose, onSubmit, 
 
   if (inline) return sheet;
   return (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 50 }}>
+    <div style={{ position: 'absolute', inset: 0, zIndex: 50, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}/>
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+      <div style={{ position: 'relative', maxHeight: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         {sheet}
       </div>
     </div>
@@ -744,7 +744,7 @@ function QuickTradeSheet({ lang = 'ru', dark = false, defaultSide = 'buy', onClo
       borderBottomLeftRadius: inline ? 28 : 0, borderBottomRightRadius: inline ? 28 : 0,
       padding: '12px 20px 34px',
       boxShadow: inline ? 'none' : '0 -8px 30px rgba(0,0,0,0.18)',
-      maxHeight: '85%', display: 'flex', flexDirection: 'column',
+      maxHeight: '100%', overflowY: 'auto', display: 'flex', flexDirection: 'column',
     }}>
         {/* grabber */}
         <div style={{ alignSelf: 'center', width: 40, height: 4, borderRadius: 999, background: dark ? 'rgba(255,255,255,0.2)' : SC.ink200, marginBottom: 16 }}/>
@@ -814,9 +814,9 @@ function QuickTradeSheet({ lang = 'ru', dark = false, defaultSide = 'buy', onClo
   if (inline) return content;
 
   return (
-    <div style={{ position: 'absolute', inset: 0, zIndex: 50 }}>
+    <div style={{ position: 'absolute', inset: 0, zIndex: 50, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
       <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(8px)' }}/>
-      <div style={{ position: 'absolute', left: 0, right: 0, bottom: 0 }}>
+      <div style={{ position: 'relative', maxHeight: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
         {content}
       </div>
     </div>
