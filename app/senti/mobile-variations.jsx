@@ -119,7 +119,7 @@ function MobileV1Green({ lang = 'ru', onProfile = () => {}, onTrade = () => {}, 
       {newsOpen && <MobileNewsScreen lang={lang} dark={false} onBack={() => setNewsOpen(false)}/>}
       {ideasOpen && <MobileIdeasScreen lang={lang} dark={false} onBack={() => setIdeasOpen(false)}/>}
       {/* Header */}
-      <div style={{ padding: '64px 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: topPad(64) + ' 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button onClick={onProfile} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, padding: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 999, background: SC.greenSoft, color: SC.greenDeep, display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 16, fontFamily: SC.fontDisplay }}>{clientInitial(lang)}</div>
           <div style={{ textAlign: 'left' }}>
@@ -138,6 +138,8 @@ function MobileV1Green({ lang = 'ru', onProfile = () => {}, onTrade = () => {}, 
         </div>
       </div>
 
+      {/* Scrollable content — everything below the fixed header */}
+      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
       {/* Hero: green wash card */}
       <div style={{ padding: '0 20px' }}>
         <div style={{
@@ -199,12 +201,10 @@ function MobileV1Green({ lang = 'ru', onProfile = () => {}, onTrade = () => {}, 
         <AllocationStrip segments={stats.allocation[lang] || PORTFOLIO.allocation[lang]} height={10}/>
       </div>
 
-      {/* Holdings preview → replaced by Ideas + News */}
-      <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-        <HomeIdeasNews lang={lang} onNav={s => s === 'news' ? setNewsOpen(true) : setIdeasOpen(true)}/>
-      </div>
-
+      {/* Ideas + News */}
+      <HomeIdeasNews lang={lang} onNav={s => s === 'news' ? setNewsOpen(true) : setIdeasOpen(true)}/>
       <div style={{ height: 86 }}/>
+      </div>{/* /scrollable content */}
       <BrokerTabs active="home" onChange={() => {}} lang={lang}/>
     </div>
   );
@@ -238,7 +238,7 @@ function MobileV2Minimal({ lang = 'ru', onProfile = () => {}, onTrade = () => {}
       {newsOpen && <MobileNewsScreen lang={lang} dark={false} onBack={() => setNewsOpen(false)}/>}
       {ideasOpen && <MobileIdeasScreen lang={lang} dark={false} onBack={() => setIdeasOpen(false)}/>}
       {/* tiny header */}
-      <div style={{ padding: '64px 24px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: topPad(64) + ' 24px 6px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button onClick={onProfile} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, fontSize: 13, color: SC.ink500, fontWeight: 500, letterSpacing: '-0.1px' }}>
           {t(lang, 'hi')}, <span style={{ color: SC.ink1000, fontWeight: 600 }}>{clientFirstName(lang)}</span>
         </button>
@@ -314,7 +314,7 @@ function MobileV3Dark({ lang = 'ru', onProfile = () => {}, onTrade = () => {}, o
       {newsOpen && <MobileNewsScreen lang={lang} dark={true} onBack={() => setNewsOpen(false)}/>}
       {ideasOpen && <MobileIdeasScreen lang={lang} dark={true} onBack={() => setIdeasOpen(false)}/>}
       {/* Header */}
-      <div style={{ padding: '64px 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: topPad(64) + ' 20px 14px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <button onClick={onProfile} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, padding: 0 }}>
           <div style={{ width: 40, height: 40, borderRadius: 999, background: 'rgba(12,71,183,0.18)', color: SC.greenBright, display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 16, fontFamily: SC.fontDisplay }}>{clientInitial(lang)}</div>
           <div style={{ textAlign: 'left' }}>

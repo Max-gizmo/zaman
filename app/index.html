@@ -6,10 +6,10 @@
 </head>
 <body>
   <script>
-    // Route by device: phones -> mobile prototype, desktops -> web prototype.
+    // Route by device: phones -> full-screen Phone prototype, desktops -> web prototype.
     var m = /Mobi|Android|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
             || Math.min(screen.width || 9999, window.innerWidth || 9999) < 820;
-    window.location.replace(m ? "Mobile%20Prototype.html" : "Web%20Prototype.html");
+    window.location.replace(m ? "Phone%20Prototype.html" : "Web%20Prototype.html");
   </script>
 </body>
 </html>

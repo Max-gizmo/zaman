@@ -42,6 +42,14 @@ const SC = {
   fontMono: "'IBM Plex Mono','SFMono-Regular',Menlo,monospace",
 };
 
+// Top inset for screen headers. The full-screen Phone build (window.SENTI_PHONE)
+// trims the simulated status-bar gap that the framed prototype needs.
+function topPad(framedPx) {
+  return (typeof window !== 'undefined' && window.SENTI_PHONE)
+    ? 'max(env(safe-area-inset-top, 0px), 14px)'
+    : framedPx + 'px';
+}
+
 // ──────────────────────────────────────────────────────────────
 // i18n — Russian primary, English fallback
 // ──────────────────────────────────────────────────────────────

@@ -197,7 +197,7 @@ function MarketsScreen({ lang = 'ru', onAsset, dark = false }) {
 
   return (
     <div style={{ position: 'absolute', inset: 0, background: bg, display: 'flex', flexDirection: 'column', color: text, overflow: 'hidden' }}>
-      <div style={{ padding: '64px 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: topPad(64) + ' 20px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600, letterSpacing: '-0.04em', fontFamily: SC.fontDisplay }}>{t(lang, 'markets')}</h1>
         {isLiveTab && (
           <span style={{ fontSize: 10, fontWeight: 600, fontFamily: SC.fontMono,
@@ -318,7 +318,7 @@ function AssetDetailScreen({ asset, lang = 'ru', onBack, onTrade, dark = false }
   return (
     <div style={{ position: 'absolute', inset: 0, background: bg, display: 'flex', flexDirection: 'column', color: text, overflow: 'hidden' }}>
       {/* Header */}
-      <div style={{ padding: '54px 20px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ padding: topPad(54) + ' 20px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: 999, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
           <Icon name="chevL" size={18} color={text}/>
         </button>
@@ -907,7 +907,7 @@ function MenuScreen({ lang = 'ru', dark = false, onProfile = () => {} }) {
 
   return (
     <div style={{ position: 'absolute', inset: 0, background: bg, color: text, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '64px 20px 14px' }}>
+      <div style={{ padding: topPad(64) + ' 20px 14px' }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600, letterSpacing: '-0.04em', fontFamily: SC.fontDisplay }}>{t(lang, 'menu')}</h1>
       </div>
       {/* Profile card — tap to open Profile */}
@@ -1058,7 +1058,7 @@ function ProfileScreen({ lang = 'ru', dark = false, onBack = () => {}, onLogout 
   ]);
   return (
     <div style={{ position: 'absolute', inset: 0, background: bg, color: text, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '54px 20px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ padding: topPad(54) + ' 20px 14px', display: 'flex', alignItems: 'center', gap: 12 }}>
         <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: 999, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
           <Icon name="chevL" size={18} color={text}/>
         </button>
@@ -1224,7 +1224,7 @@ function MobileAssetsView({ lang = 'ru', dark = false, onAsset = () => {} }) {
   ];
   return (
     <div style={{ position: 'absolute', inset: 0, background: bg, color: text, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '64px 20px 8px' }}>
+      <div style={{ padding: topPad(64) + ' 20px 8px' }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600, letterSpacing: '-0.04em', fontFamily: SC.fontDisplay }}>{t(lang, 'assets')}</h1>
       </div>
       {/* Tabs (segment) */}
@@ -1544,7 +1544,7 @@ function MobileNewsScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
 
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 50, background: bg, color: text, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '54px 20px 12px', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+      <div style={{ padding: topPad(54) + ' 20px 12px', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: 999, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
           <Icon name="chevL" size={18} color={text}/>
         </button>
@@ -1603,7 +1603,7 @@ function MobileIdeasScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
 
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 50, background: bg, color: text, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-      <div style={{ padding: '54px 20px 12px', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
+      <div style={{ padding: topPad(54) + ' 20px 12px', display: 'flex', alignItems: 'center', gap: 12, flexShrink: 0 }}>
         <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: 999, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
           <Icon name="chevL" size={18} color={text}/>
         </button>
@@ -1853,7 +1853,7 @@ function HistoryScreen({ lang = 'ru', dark = false }) {
   return (
     <div style={{ position: 'absolute', inset: 0, background: bg, color: text, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ padding: '64px 20px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ padding: topPad(64) + ' 20px 8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <h1 style={{ margin: 0, fontSize: 28, fontWeight: 600, letterSpacing: '-0.04em', fontFamily: SC.fontDisplay }}>
           {lang === 'ru' ? 'История' : 'History'}
         </h1>
@@ -2018,7 +2018,7 @@ function NotificationsScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 20, background: bg, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ padding: '56px 20px 12px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${border}` }}>
+      <div style={{ padding: topPad(56) + ' 20px 12px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${border}` }}>
         <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, marginLeft: -6 }}>
           <Icon name="arrLeft" size={22} color={text}/>
         </button>
@@ -2140,7 +2140,7 @@ function ChatScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 20, background: bg, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div style={{ padding: '52px 20px 12px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${border}` }}>
+      <div style={{ padding: topPad(52) + ' 20px 12px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${border}` }}>
         <button onClick={onBack} style={{ width: 36, height: 36, borderRadius: 12, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
           <Icon name="arrLeft" size={18} color={text}/>
         </button>

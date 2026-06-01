@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<title>Zaman — Phone</title>
+<link rel="stylesheet" href="senti/colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #fff; font-family: var(--font-body); color: var(--ink-1000); overflow: hidden; overscroll-behavior: none; }
+  body.dark-stage { background: #0E1413; }
+  /* Full-screen single phone surface — no device frame, no side rail. */
+  #root { position: fixed; inset: 0; }
+  .phone-screen { position: fixed; inset: 0; overflow: hidden; background: #fff; }
+  body.dark-stage .phone-screen { background: #0E1413; }
+  @keyframes toast-in { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="senti/ios-frame.jsx"></script>
+  <script type="text/babel" src="senti/brokerage-atoms.jsx"></script>
+  <script type="text/babel" src="senti/binance-data.jsx"></script>
+  <script type="text/babel" src="senti/bybit-data.jsx"></script>
+  <script type="text/babel" src="senti/mobile-variations.jsx"></script>
+  <script type="text/babel" src="senti/mobile-extra-screens.jsx"></script>
+  <script type="text/babel" src="senti/web-extra-screens.jsx"></script>
+  <script type="text/babel" src="senti/topup-sheet.jsx"></script>
+  <script type="text/babel" src="senti/auth.jsx"></script>
+
+  <script>window.SENTI_PHONE = true;</script>
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = { theme: "light", lang: "ru", variant: "v1" };
+
+    // Full-screen phone app — same screens/logic as the Mobile prototype but
+    // rendered edge-to-edge with no simulated device frame or side rail.
+    function App({ onLogout = () => {}, sentiClient = null } = {}) {
+      const tweaks = TWEAK_DEFAULTS;
+      const dark = tweaks.theme === 'dark';
+      const lang = tweaks.lang;
+      const variant = tweaks.variant;
+
+      const [screen, setScreen]       = React.useState('home');
+      const [asset, setAsset]         = React.useState(null);
+      const [trade, setTrade]         = React.useState(null);
+      const [quickTrade, setQuickTrade] = React.useState(null);
+      const [toast, setToast]         = React.useState(null);
+      const [mobileTopUp, setMobileTopUp] = React.useState(false);
+      const [mobileWithdraw, setMobileWithdraw] = React.useState(false);
+
+      React.useEffect(() => { document.body.classList.toggle('dark-stage', dark); }, [dark]);
+
+      const onTabChange = (id) => {
+        if (id === 'trade') setQuickTrade('buy');
+        else if (id === 'topup') setMobileTopUp(true);
+        else { setScreen(id); setAsset(null); }
+      };
+      const onAssetTap = (a) => { setAsset(a); };
+      const onTrade = (side, a) => { setTrade({ side, asset: a }); };
+      const onTradeSubmit = (side, a, amt) => {
+        setTrade(null);
+        const usd = amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        setToast(lang === 'ru'
+          ? `${side === 'buy' ? 'Куплено' : 'Продано'} ${a.symbol} на $${usd}`
+          : `${side === 'buy' ? 'Bought' : 'Sold'} ${a.symbol} for $${usd}`);
+        setTimeout(() => setToast(null), 2400);
+      };
+
+      const HomeComponent = variant === 'v2' ? MobileV2Minimal : variant === 'v3' ? MobileV3Dark : MobileV1Green;
+      const forceDark = variant === 'v3' || dark;
+
+      const screens = {
+        home:     <HomeComponent lang={lang} onProfile={() => { setScreen('profile'); setAsset(null); }} onTrade={side => setQuickTrade(side)} onTopUp={() => setMobileTopUp(true)} onWithdraw={() => setMobileWithdraw(true)}/>,
+        markets:  <MarketsScreen lang={lang} dark={forceDark} onAsset={onAssetTap}/>,
+        assets:   <MobileAssetsView lang={lang} dark={forceDark} onAsset={onAssetTap}/>,
+        history:  <HistoryScreen lang={lang} dark={forceDark}/>,
+        menu:     <MenuScreen lang={lang} dark={forceDark} onProfile={() => { setScreen('profile'); setAsset(null); }}/>,
+        profile:  <ProfileScreen lang={lang} dark={forceDark} onBack={() => setScreen('home')} onLogout={onLogout}/>,
+      };
+
+      const screenView = asset
+        ? <AssetDetailScreen asset={asset} lang={lang} dark={forceDark} onBack={() => setAsset(null)} onTrade={onTrade}/>
+        : (screens[screen] || screens.home);
+
+      const showTabs = !asset && screen !== 'trade' && screen !== 'profile';
+      const activeTab = screen === 'home' ? 'home' :
+                        screen === 'markets' ? 'markets' :
+                        screen === 'history' ? 'history' :
+                        screen === 'assets' ? 'assets' : 'home';
+
+      return (
+        <div className="phone-screen">
+          {screenView}
+          {showTabs && <BrokerTabs active={activeTab} onChange={onTabChange} lang={lang} dark={forceDark}/>}
+          {quickTrade && <QuickTradeSheet lang={lang} dark={forceDark} defaultSide={quickTrade}
+                           onClose={() => setQuickTrade(null)}
+                           onPick={a => { setQuickTrade(null); setTrade({ side: quickTrade, asset: a }); }}/>}
+          {trade && <TradeSheet side={trade.side} asset={trade.asset} lang={lang} dark={forceDark}
+                      onClose={() => setTrade(null)} onSubmit={onTradeSubmit}/>}
+          {toast && <TradeToast message={toast} dark={forceDark}/>}
+          {mobileTopUp && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 90, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+              <div onClick={() => setMobileTopUp(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}/>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <TopUpSheet lang={lang} dark={forceDark} mobile onClose={() => setMobileTopUp(false)}/>
+              </div>
+            </div>
+          )}
+          {mobileWithdraw && (
+            <div style={{ position: 'absolute', inset: 0, zIndex: 90, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+              <div onClick={() => setMobileWithdraw(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}/>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <WithdrawSheet lang={lang} dark={forceDark} mobile onClose={() => setMobileWithdraw(false)}/>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<AuthGate><App/></AuthGate>);
+  </script>
+</body>
+</html>
