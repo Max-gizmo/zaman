@@ -270,7 +270,7 @@ function WebNotifOverlay({ lang = 'ru', dark = false, onClose = () => {} }) {
             </button>
           )}
           <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, background: fieldBg, border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
-            <Icon name="close" size={14} color={sub}/>
+            <Icon name="chevL" size={16} color={text}/>
           </button>
         </div>
         {/* Tabs */}
@@ -382,7 +382,7 @@ function WebChatOverlay({ lang = 'ru', dark = false, onClose = () => {} }) {
           <div style={{ fontSize: 11, color: SC.green, fontWeight: 500 }}>● {lang === 'ru' ? 'Онлайн' : 'Online'}</div>
         </div>
         <button onClick={onClose} style={{ width: 32, height: 32, borderRadius: 10, background: fieldBg, border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
-          <Icon name="close" size={14} color={sub}/>
+          <Icon name="chevL" size={16} color={text}/>
         </button>
       </div>
 

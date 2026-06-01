@@ -2019,8 +2019,8 @@ function NotificationsScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
     <div style={{ position: 'absolute', inset: 0, zIndex: 20, background: bg, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ padding: topPad(56) + ' 20px 12px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${border}` }}>
-        <button onClick={onBack} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 6, marginLeft: -6 }}>
-          <Icon name="arrLeft" size={22} color={text}/>
+        <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: 999, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer', flexShrink: 0 }}>
+          <Icon name="chevL" size={20} color={text}/>
         </button>
         <div style={{ flex: 1, fontWeight: 700, fontSize: 18, color: text, letterSpacing: '-0.3px' }}>
           {lang === 'ru' ? 'Уведомления' : 'Notifications'}
@@ -2141,8 +2141,8 @@ function ChatScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
     <div style={{ position: 'absolute', inset: 0, zIndex: 20, background: bg, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ padding: topPad(52) + ' 20px 12px', display: 'flex', alignItems: 'center', gap: 12, borderBottom: `1px solid ${border}` }}>
-        <button onClick={onBack} style={{ width: 36, height: 36, borderRadius: 12, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer' }}>
-          <Icon name="arrLeft" size={18} color={text}/>
+        <button onClick={onBack} style={{ width: 40, height: 40, borderRadius: 999, background: fieldBg, border: 'none', display: 'grid', placeItems: 'center', cursor: 'pointer', flexShrink: 0 }}>
+          <Icon name="chevL" size={20} color={text}/>
         </button>
         <div style={{ width: 40, height: 40, borderRadius: 999, background: SC.greenSoft, display: 'grid', placeItems: 'center', flexShrink: 0 }}>
           <Icon name="sparkles" size={18} color={SC.greenDeep}/>
