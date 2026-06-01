@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Zaman Brokerage — Web prototype</title>
+<link rel="stylesheet" href="senti/colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; background: #1a1e1c; font-family: var(--font-body); color: var(--ink-1000); overflow: hidden; }
+  body.light-stage { background: #f0eee9; }
+
+  /* Browser chrome shell — gives the dashboard a desktop context */
+  .stage {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .window {
+    width: min(1440px, calc(100vw - 48px));
+    height: min(900px, calc(100vh - 48px));
+    border-radius: 16px; overflow: hidden;
+    box-shadow: 0 30px 80px -10px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,0,0,0.08);
+    background: var(--paper);
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .titlebar {
+    height: 38px; flex: 0 0 38px;
+    background: var(--ink-100);
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 14px;
+    border-bottom: 1px solid var(--ink-200);
+  }
+  body.dark-stage .titlebar { background: var(--ink-900); border-bottom-color: rgba(255,255,255,0.08); }
+  .tl-dot { width: 12px; height: 12px; border-radius: 999px; background: var(--ink-300); }
+  .tl-dot.r { background: #FF5F57; }
+  .tl-dot.y { background: #FEBC2E; }
+  .tl-dot.g { background: #28C840; }
+  .titlebar .url {
+    flex: 1; max-width: 380px; margin: 0 auto;
+    background: var(--paper); border: 1px solid var(--ink-200); border-radius: 999px;
+    padding: 4px 14px; font-family: var(--font-mono); font-size: 11px; color: var(--ink-500);
+    text-align: center;
+  }
+  body.dark-stage .titlebar .url { background: var(--ink-1000); border-color: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5); }
+  .titlebar .corner { width: 60px; }
+
+  .window-body { flex: 1; display: flex; overflow: hidden; }
+
+  /* dashboard slot is sized by content (WebSidebar + main) so it expands to fill */
+</style>
+</head>
+<body class="dark-stage">
+  <div class="stage">
+    <div class="window">
+      <div class="titlebar">
+        <div class="tl-dot r"></div><div class="tl-dot y"></div><div class="tl-dot g"></div>
+        <div class="url" id="urlbar">zaman.kg / dashboard</div>
+        <div class="corner"></div>
+      </div>
+      <div class="window-body" id="root"></div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="senti/brokerage-atoms.jsx"></script>
+  <script type="text/babel" src="senti/binance-data.jsx"></script>
+  <script type="text/babel" src="senti/bybit-data.jsx"></script>
+  <script type="text/babel" src="senti/mobile-variations.jsx"></script>
+  <script type="text/babel" src="senti/mobile-extra-screens.jsx"></script>
+  <script type="text/babel" src="senti/web-variations.jsx"></script>
+  <script type="text/babel" src="senti/web-extra-screens.jsx"></script>
+  <script type="text/babel" src="senti/topup-sheet.jsx"></script>
+  <script type="text/babel" src="senti/tweaks-panel.jsx"></script>
+  <script type="text/babel" src="senti/auth.jsx"></script>
+
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "theme": "light",
+      "lang": "ru",
+      "variant": "v1"
+    }/*EDITMODE-END*/;
+
+    // Internal sidebar that drives the prototype's screen state
+    function ProtoSidebar({ lang, dark, active, onNav }) {
+      const items = lang === 'ru' ? [
+        { id: 'home',     label: 'Главная',    icon: 'home' },
+        { id: 'portfolio',label: 'Активы',      icon: 'wallet' },
+        { id: 'markets',  label: 'Рынки',      icon: 'chart' },
+        { id: 'withdraw', label: 'Вывод',       icon: 'upload' },
+        { id: 'history',  label: 'История',    icon: 'layers' },
+        { id: 'learn',    label: 'Обучение',   icon: 'book' },
+        { id: 'settings', label: 'Настройки',  icon: 'settings' },
+      ] : [
+        { id: 'home',     label: 'Home',       icon: 'home' },
+        { id: 'portfolio',label: 'Assets',      icon: 'wallet' },
+        { id: 'markets',  label: 'Markets',    icon: 'chart' },
+        { id: 'withdraw', label: 'Withdraw',   icon: 'upload' },
+        { id: 'history',  label: 'History',    icon: 'layers' },
+        { id: 'learn',    label: 'Learn',      icon: 'book' },
+        { id: 'settings', label: 'Settings',   icon: 'settings' },
+      ];
+      const text = dark ? '#fff' : SC.ink1000;
+      const sub  = dark ? 'rgba(255,255,255,0.5)' : SC.ink500;
+      const bg   = dark ? SC.ink1000 : SC.paper;
+      const fieldBg = dark ? 'rgba(255,255,255,0.04)' : SC.ink50;
+      const border = dark ? '1px solid rgba(255,255,255,0.06)' : `1px solid ${SC.ink200}`;
+      return (
+        <aside style={{
+          width: 232, flex: '0 0 232px',
+          background: bg, borderRight: border,
+          display: 'flex', flexDirection: 'column',
+          padding: '20px 14px 18px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '0 8px 24px' }}>
+            <SentiWordmark height={24} color={SC.green} textColor={text}/>
+          </div>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {items.map(item => {
+              const on = active === item.id;
+              return (
+                <button key={item.id} onClick={() => onNav(item.id)} style={{
+                  background: on ? (dark ? 'rgba(12,71,183,0.16)' : SC.greenWash) : 'transparent',
+                  color: on ? (dark ? SC.greenBright : SC.greenDeep) : sub,
+                  border: 'none', cursor: 'pointer',
+                  padding: '9px 12px', borderRadius: 12,
+                  display: 'flex', alignItems: 'center', gap: 12,
+                  fontFamily: SC.fontDisplay, fontWeight: on ? 600 : 500, fontSize: 13,
+                  letterSpacing: '-0.2px', textAlign: 'left',
+                }}>
+                  <Icon name={item.icon} size={17} color={on ? (dark ? SC.greenBright : SC.greenDeep) : sub}/>
+                  <span style={{ flex: 1 }}>{item.label}</span>
+                  {item.id === 'learn' && (
+                    <span style={{ fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 999, background: SC.lime, color: SC.ink1000 }}>NEW</span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+          <div style={{ flex: 1 }}/>
+          {/* Education card — square, shown on every screen */}
+          <div style={{ marginBottom: 10, padding: '14px', borderRadius: 14, background: dark ? 'rgba(255,255,255,0.05)' : SC.ink50, border: dark ? '1px solid rgba(255,255,255,0.07)' : `1px solid ${SC.ink200}` }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: SC.lime, display: 'grid', placeItems: 'center', marginBottom: 10 }}>
+              <Icon name="book" size={17} color={SC.ink1000} strokeWidth={2}/>
+            </div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: text, letterSpacing: '-0.2px', marginBottom: 4, lineHeight: 1.3 }}>
+              {lang === 'ru' ? 'Не уверены, с чего начать?' : 'Not sure where to start?'}
+            </div>
+            <div style={{ fontSize: 11, color: sub, marginBottom: 12, lineHeight: 1.4 }}>
+              {lang === 'ru' ? 'Пройдите 5-минутный тест.' : 'Take a 5-minute test.'}
+            </div>
+            <Pill variant="primary" size="sm" arrow full>{lang === 'ru' ? 'Начать' : 'Start'}</Pill>
+          </div>
+          <button onClick={() => onNav('profile')} style={{ padding: '10px 12px', borderRadius: 12, background: fieldBg, display: 'flex', alignItems: 'center', gap: 10, border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}>
+            <div style={{ width: 30, height: 30, borderRadius: 999, background: SC.greenSoft, color: SC.greenDeep, display: 'grid', placeItems: 'center', fontWeight: 700, fontSize: 12, fontFamily: SC.fontDisplay, flexShrink: 0 }}>{clientInitial(lang)}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: text, letterSpacing: '-0.2px' }}>{clientName(lang)}</div>
+              <div style={{ fontSize: 10, color: sub, fontFamily: SC.fontMono }}>{clientMeta(lang)}</div>
+            </div>
+            <Icon name="chevR" size={14} color={sub}/>
+          </button>
+        </aside>
+      );
+    }
+
+    function ProtoTopBar({ lang, setLang, dark, screen, onChat, onNotif = () => {} }) {
+      const text = dark ? '#fff' : SC.ink1000;
+      const sub = dark ? 'rgba(255,255,255,0.5)' : SC.ink500;
+      const border = dark ? '1px solid rgba(255,255,255,0.06)' : `1px solid ${SC.ink200}`;
+      const fieldBg = dark ? 'rgba(255,255,255,0.05)' : SC.ink50;
+      const bg = dark ? SC.ink1000 : SC.paper;
+      return (
+        <div style={{
+          height: 60, flex: '0 0 60px',
+          background: bg,
+          borderBottom: border,
+          display: 'flex', alignItems: 'center', gap: 14,
+          padding: '0 28px',
+        }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: text, letterSpacing: '-0.2px' }}>
+            {lang === 'ru' ? `Здравствуйте, ${clientFirstName(lang)}` : `Hello, ${clientFirstName(lang)}`}
+          </div>
+          <div style={{ flex: 1 }}/>
+          <div style={{ display: 'flex', alignItems: 'center', background: fieldBg, borderRadius: 999, padding: 2 }}>
+            {['ru', 'en'].map(l => (
+              <button key={l} onClick={() => setLang(l)} style={{
+                background: lang === l ? (dark ? '#fff' : SC.ink1000) : 'transparent',
+                color: lang === l ? (dark ? SC.ink1000 : '#fff') : sub,
+                border: 'none', cursor: 'pointer',
+                padding: '5px 12px', borderRadius: 999, fontSize: 11, fontWeight: 600,
+                fontFamily: SC.fontDisplay, letterSpacing: '0.06em', textTransform: 'uppercase',
+              }}>{l}</button>
+            ))}
+          </div>
+          <button onClick={onNotif} style={{ width: 34, height: 34, borderRadius: 999, background: fieldBg, border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center', position: 'relative' }}>
+            <Icon name="bell" size={15} color={text}/>
+            <span style={{ position: 'absolute', top: 8, right: 9, width: 7, height: 7, borderRadius: 999, background: SC.green, border: `2px solid ${bg}` }}/>
+          </button>
+          <button onClick={onChat} style={{ width: 34, height: 34, borderRadius: 999, background: fieldBg, border: 'none', cursor: 'pointer', display: 'grid', placeItems: 'center' }}>
+            <Icon name="chat" size={15} color={text}/>
+          </button>
+        </div>
+      );
+    }
+
+    function App({ onLogout = () => {}, sentiClient = null } = {}) {
+      const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+      const dark = tweaks.theme === 'dark';
+      const lang = tweaks.lang;
+      const variant = tweaks.variant;
+      const [screen, setScreen]         = React.useState('home');
+      const [asset, setAsset]           = React.useState(null);
+      const [webQuickTrade, setWebQuickTrade] = React.useState(null); // null | 'buy' | 'sell'
+      const [webTrade, setWebTrade]     = React.useState(null); // { side, asset }
+      const [webTopUp, setWebTopUp]     = React.useState(false);
+      const [webWithdraw, setWebWithdraw] = React.useState(false);
+      const [chatOpen, setChatOpen]     = React.useState(false);
+      const [notifOpen, setNotifOpen]   = React.useState(false);
+      const [toast, setToast]           = React.useState(null);
+
+      React.useEffect(() => {
+        document.body.classList.toggle('dark-stage', dark);
+        document.body.classList.toggle('light-stage', !dark);
+        const url = document.getElementById('urlbar');
+        if (url) url.textContent = `zaman.kg / ${asset ? `asset/${asset.symbol.toLowerCase()}` : screen}`;
+      }, [dark, screen, asset]);
+
+      const onNav = (id) => { setScreen(id); setAsset(null); };
+
+      // Variation home dashboards (V1/V2/V3) live on the *portfolio* route now.
+      // Home becomes the Investment Ideas screen.
+      const PortfolioComponent = variant === 'v2' ? WebV2Minimal : variant === 'v3' ? WebV3Dark : WebV1Green;
+      const forceDark = variant === 'v3' || dark;
+
+      // For sub-screens (markets, exchange, history, asset) we use a unified shell:
+      // sidebar + topbar + content.
+      const renderShell = (content) => (
+        <React.Fragment>
+          {chatOpen  && <WebChatOverlay  lang={lang} dark={forceDark} onClose={() => setChatOpen(false)}/>}
+          {notifOpen && <WebNotifOverlay lang={lang} dark={forceDark} onClose={() => setNotifOpen(false)}/>}
+          <ProtoSidebar lang={lang} dark={forceDark} active={screen} onNav={onNav}/>
+          <main style={{ flex: 1, display: 'flex', flexDirection: 'column', background: forceDark ? SC.ink1000 : SC.paper, overflow: 'hidden', color: forceDark ? '#fff' : SC.ink1000 }}>
+            <ProtoTopBar lang={lang} setLang={l => setTweak('lang', l)} dark={forceDark} screen={screen} onChat={() => setChatOpen(v => !v)} onNotif={() => setNotifOpen(v => !v)}/>
+            <div style={{ flex: 1, overflow: 'hidden' }}>{content}</div>
+          </main>
+        </React.Fragment>
+      );
+
+      let inner;
+      if (asset) {
+        inner = renderShell(<WebAssetDetail asset={asset} lang={lang} dark={forceDark} onBack={() => setAsset(null)}
+                              onTrade={(side, a) => {
+                                const amtEl = document.querySelector('input[type=number]');
+                                const amt = amtEl ? parseFloat(amtEl.value) || 0 : 0;
+                                const usd = amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                setToast(lang === 'ru'
+                                  ? `${side === 'buy' ? 'Куплено' : 'Продано'} ${a.symbol} на $${usd}`
+                                  : `${side === 'buy' ? 'Bought' : 'Sold'} ${a.symbol} for $${usd}`);
+                                setTimeout(() => setToast(null), 2400);
+                              }}/>);
+      } else if (screen === 'news') {
+        inner = renderShell(<WebNewsScreen lang={lang} dark={forceDark}/>);
+      } else if (screen === 'ideas') {
+        inner = renderShell(<WebIdeasScreen lang={lang} dark={forceDark}/>);
+      } else if (screen === 'markets') {
+        inner = renderShell(<WebMarketsView lang={lang} dark={forceDark} onAsset={setAsset}/>);
+      } else if (screen === 'withdraw') {
+        inner = renderShell(<WebWithdraw lang={lang} dark={forceDark} onCryptoWithdraw={() => setWebWithdraw(true)}/>);
+      } else if (screen === 'history') {
+        inner = renderShell(<WebHistory lang={lang} dark={forceDark}/>);
+      } else if (screen === 'portfolio') {
+        inner = <PortfolioComponent lang={lang} setLang={l => setTweak('lang', l)} onNav={onNav} active={screen}
+                  onTrade={side => setWebQuickTrade(side)} onTopUp={() => setWebTopUp(true)} onWithdraw={() => setWebWithdraw(true)}/>;
+      } else if (screen === 'settings' || screen === 'profile') {
+        inner = renderShell(<WebProfileScreen lang={lang} dark={forceDark} onLogout={onLogout}/>);
+      } else if (screen === 'learn') {
+        inner = renderShell(
+          <div style={{ padding: '60px 32px', color: forceDark ? '#fff' : SC.ink1000, fontFamily: SC.fontDisplay }}>
+            <h1 style={{ margin: '4px 0 8px', fontSize: 32, fontWeight: 600, letterSpacing: '-0.03em' }}>
+              {lang === 'ru' ? 'Обучение' : 'Learn'}
+            </h1>
+            <p style={{ color: forceDark ? 'rgba(255,255,255,0.5)' : SC.ink500, fontSize: 15, maxWidth: 480, letterSpacing: '-0.1px' }}>
+              {lang === 'ru' ? 'Раздел в работе.' : 'Section in progress.'}
+            </p>
+          </div>
+        );
+      } else {
+        // Home — Investment Ideas
+        inner = renderShell(<WebInvestmentIdeas lang={lang} dark={forceDark} onNav={onNav} onTrade={side => setWebQuickTrade(side)} onTopUp={() => setWebTopUp(true)} onWithdraw={() => setWebWithdraw(true)}/>);
+      }
+
+      const onWebTradeSubmit = (side, a, amt) => {
+        setWebTrade(null);
+        const usd = amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        setToast(lang === 'ru'
+          ? `${side === 'buy' ? 'Куплено' : 'Продано'} ${a.symbol} на $${usd}`
+          : `${side === 'buy' ? 'Bought' : 'Sold'} ${a.symbol} for $${usd}`);
+        setTimeout(() => setToast(null), 2400);
+      };
+
+      return (
+        <React.Fragment>
+          {inner}
+          {webQuickTrade && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div onClick={() => setWebQuickTrade(null)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}/>
+              <div style={{ position: 'relative', width: 420, maxHeight: '80vh', overflowY: 'auto', borderRadius: 28,
+                background: forceDark ? SC.ink900 : SC.paper, boxShadow: '0 24px 60px -8px rgba(0,0,0,0.35)', display: 'flex', flexDirection: 'column' }}>
+                <QuickTradeSheet lang={lang} dark={forceDark} defaultSide={webQuickTrade} inline
+                  onClose={() => setWebQuickTrade(null)}
+                  onPick={a => { setWebQuickTrade(null); setWebTrade({ side: webQuickTrade, asset: a }); }}/>
+              </div>
+            </div>
+          )}
+          {webTrade && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div onClick={() => setWebTrade(null)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}/>
+              <div style={{ position: 'relative', width: 380, borderRadius: 28,
+                background: forceDark ? SC.ink900 : SC.paper, boxShadow: '0 24px 60px -8px rgba(0,0,0,0.35)', overflow: 'hidden' }}>
+                <TradeSheet side={webTrade.side} asset={webTrade.asset} lang={lang} dark={forceDark} inline
+                  onClose={() => setWebTrade(null)} onSubmit={onWebTradeSubmit}/>
+              </div>
+            </div>
+          )}
+          {webTopUp && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div onClick={() => setWebTopUp(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}/>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <TopUpSheet lang={lang} dark={forceDark} onClose={() => setWebTopUp(false)}/>
+              </div>
+            </div>
+          )}
+          {webWithdraw && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 80, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div onClick={() => setWebWithdraw(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(6px)' }}/>
+              <div style={{ position: 'relative', zIndex: 1 }}>
+                <WithdrawSheet lang={lang} dark={forceDark} onClose={() => setWebWithdraw(false)}/>
+              </div>
+            </div>
+          )}
+          {toast && (
+            <div style={{
+              position: 'absolute', bottom: 28, right: 28, zIndex: 60,
+              padding: '14px 18px', borderRadius: 16,
+              background: SC.green, color: '#fff',
+              display: 'flex', alignItems: 'center', gap: 12,
+              boxShadow: '0 14px 30px -8px rgba(12,71,183,0.5)',
+              animation: 'toast-in 0.4s cubic-bezier(.22,1,.36,1)',
+              fontFamily: SC.fontDisplay, fontWeight: 600, fontSize: 13,
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5 5L20 7"/></svg>
+              {toast}
+            </div>
+          )}
+          <TweaksPanel title={lang === 'ru' ? 'Tweaks' : 'Tweaks'}>
+            <TweakSection title={lang === 'ru' ? 'Тема' : 'Theme'}>
+              <TweakRadio value={tweaks.theme} onChange={v => setTweak('theme', v)} options={[
+                { value: 'light', label: lang === 'ru' ? 'Светлая' : 'Light' },
+                { value: 'dark',  label: lang === 'ru' ? 'Тёмная'  : 'Dark' },
+              ]}/>
+            </TweakSection>
+            <TweakSection title={lang === 'ru' ? 'Язык' : 'Language'}>
+              <TweakRadio value={tweaks.lang} onChange={v => setTweak('lang', v)} options={[
+                { value: 'ru', label: 'Русский' },
+                { value: 'en', label: 'English' },
+              ]}/>
+            </TweakSection>
+            <TweakSection title={lang === 'ru' ? 'Портфель — стиль' : 'Portfolio style'}>
+              <TweakSelect value={tweaks.variant} onChange={v => setTweak('variant', v)} options={[
+                { value: 'v1', label: lang === 'ru' ? 'V1 · Зелёный'    : 'V1 · Green hero' },
+                { value: 'v2', label: lang === 'ru' ? 'V2 · Минимализм' : 'V2 · Minimal' },
+                { value: 'v3', label: lang === 'ru' ? 'V3 · Тёмная'     : 'V3 · Dark' },
+              ]}/>
+            </TweakSection>
+          </TweaksPanel>
+        </React.Fragment>
+      );
+    }
+
+    // Mount React into the window body — gated behind auth (register / login / PIN)
+    ReactDOM.createRoot(document.getElementById('root')).render(<AuthGate><App/></AuthGate>);
+  </script>
+
+  <style>
+    @keyframes toast-in {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</body>
+</html>

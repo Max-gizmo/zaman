@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Zaman Brokerage — Mobile prototype</title>
+<link rel="stylesheet" href="senti/colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100vh; background: #f0eee9; font-family: var(--font-body); color: var(--ink-1000); }
+  body.dark-stage { background: #1a1e1c; }
+
+  .stage {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    padding: 40px 24px; gap: 32px; flex-wrap: wrap;
+  }
+  .left-rail {
+    display: flex; flex-direction: column; gap: 14px;
+    width: 260px; padding: 22px 20px;
+    background: #fff; border: 1px solid var(--ink-200); border-radius: 22px;
+  }
+  body.dark-stage .left-rail { background: var(--ink-900); border-color: rgba(255,255,255,0.08); color: #fff; }
+  .left-rail .brand { display: flex; align-items: center; gap: 10px; }
+  .left-rail .brand-logo { width: 32px; height: 32px; border-radius: 9px; background: var(--senti-green); color: #fff; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; }
+  .left-rail h1 { margin: 0; font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: -0.02em; }
+  .left-rail .small { font-family: var(--font-mono); font-size: 11px; color: var(--ink-500); text-transform: uppercase; letter-spacing: 0.08em; }
+  body.dark-stage .left-rail .small { color: rgba(255,255,255,0.5); }
+  .left-rail .nav { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+  .left-rail .nav button {
+    background: transparent; border: none; cursor: pointer; text-align: left;
+    padding: 9px 12px; border-radius: 10px; font-family: var(--font-display); font-weight: 500;
+    font-size: 13px; color: var(--ink-1000); letter-spacing: -0.1px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  body.dark-stage .left-rail .nav button { color: #fff; }
+  .left-rail .nav button .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--senti-green); }
+  .left-rail .nav button.on { background: var(--ink-1000); color: #fff; font-weight: 600; }
+  body.dark-stage .left-rail .nav button.on { background: #fff; color: var(--ink-1000); }
+  .left-rail .nav button:hover:not(.on) { background: var(--ink-100); }
+  body.dark-stage .left-rail .nav button:hover:not(.on) { background: rgba(255,255,255,0.06); }
+  .left-rail .hint { font-size: 11px; color: var(--ink-500); line-height: 1.5; }
+  body.dark-stage .left-rail .hint { color: rgba(255,255,255,0.45); }
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    color: var(--ink-500); text-decoration: none; font-size: 12px; font-weight: 500;
+  }
+  body.dark-stage .back-link { color: rgba(255,255,255,0.5); }
+  .back-link:hover { color: var(--ink-1000); }
+  body.dark-stage .back-link:hover { color: #fff; }
+
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <aside class="left-rail">
+      <div class="brand"><div class="brand-logo">S</div>
+        <div>
+          <h1>Zaman Mobile</h1>
+          <div class="small">Interactive · v1</div>
+        </div>
+      </div>
+      <a href="Zaman Brokerage.html" class="back-link">← All variations</a>
+      <div class="nav" id="nav">
+        <button data-screen="home"     class="on"><span class="dot"></span><span data-i18n="nav.home">Главная</span></button>
+        <button data-screen="markets"  ><span class="dot"></span><span data-i18n="nav.markets">Рынки</span></button>
+        <button data-screen="trade"    ><span class="dot"></span><span data-i18n="nav.trade">Быстрая сделка</span></button>
+        <button data-screen="assets"   ><span class="dot"></span><span data-i18n="nav.assets">Активы</span></button>
+        <button data-screen="history"  ><span class="dot"></span><span data-i18n="nav.history">История</span></button>
+        <button data-screen="menu"     ><span class="dot"></span><span data-i18n="nav.menu">Меню</span></button>
+        <button data-screen="profile"  ><span class="dot"></span><span data-i18n="nav.profile">Профиль</span></button>
+      </div>
+      <div class="hint" id="hint">Профиль открывается при тапе по имени в верхнем левом углу главного экрана (вокруг «А»). Нижняя вкладка «Меню» — это общий хаб.</div>
+    </aside>
+
+    <div id="root"></div>
+  </div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="senti/ios-frame.jsx"></script>
+  <script type="text/babel" src="senti/brokerage-atoms.jsx"></script>
+  <script type="text/babel" src="senti/binance-data.jsx"></script>
+  <script type="text/babel" src="senti/bybit-data.jsx"></script>
+  <script type="text/babel" src="senti/mobile-variations.jsx"></script>
+  <script type="text/babel" src="senti/mobile-extra-screens.jsx"></script>
+  <script type="text/babel" src="senti/web-extra-screens.jsx"></script>
+  <script type="text/babel" src="senti/topup-sheet.jsx"></script>
+  <script type="text/babel" src="senti/tweaks-panel.jsx"></script>
+  <script type="text/babel" src="senti/auth.jsx"></script>
+
+  <script type="text/babel">
+    const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+      "theme": "light",
+      "lang": "ru",
+      "variant": "v1"
+    }/*EDITMODE-END*/;
+
+    function App({ onLogout = () => {}, sentiClient = null } = {}) {
+      const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+      const dark = tweaks.theme === 'dark';
+      const lang = tweaks.lang;
+      const variant = tweaks.variant;
+
+      const [screen, setScreen]       = React.useState('home');
+      const [asset, setAsset]         = React.useState(null);
+      const [trade, setTrade]         = React.useState(null); // { side, asset } or null
+      const [quickTrade, setQuickTrade] = React.useState(null); // null | 'buy' | 'sell'
+      const [toast, setToast]         = React.useState(null);
+
+      // Update stage bg by theme
+      React.useEffect(() => {
+        document.body.classList.toggle('dark-stage', dark);
+      }, [dark]);
+
+      // Sync side panel
+      React.useEffect(() => {
+        document.querySelectorAll('#nav button').forEach(b => {
+          b.classList.toggle('on', b.dataset.screen === screen);
+          b.onclick = () => {
+            if (b.dataset.screen === 'trade') {
+              setQuickTrade('buy');
+            } else {
+              setScreen(b.dataset.screen);
+              setAsset(null);
+            }
+          };
+        });
+      }, [screen]);
+
+      // Localize side panel labels
+      React.useEffect(() => {
+        const map = lang === 'ru'
+          ? { 'nav.home': 'Главная', 'nav.markets': 'Рынки', 'nav.trade': 'Быстрая сделка', 'nav.assets': 'Активы', 'nav.history': 'История', 'nav.menu': 'Меню', 'nav.profile': 'Профиль' }
+          : { 'nav.home': 'Home',    'nav.markets': 'Markets','nav.trade': 'Quick trade',    'nav.assets': 'Assets', 'nav.history': 'History', 'nav.menu': 'Menu', 'nav.profile': 'Profile' };
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.getAttribute('data-i18n');
+          if (map[key]) el.textContent = map[key];
+        });
+        const hint = document.getElementById('hint');
+        if (hint) hint.textContent = lang === 'ru'
+          ? 'Профиль открывается при тапе по имени в верхнем левом углу главного экрана. «Меню» — общий хаб.'
+          : 'Profile opens when you tap your name in the top-left of the home screen. "Menu" is the general hub.';
+      }, [lang]);
+
+      const [mobileTopUp, setMobileTopUp] = React.useState(false);
+      const [mobileWithdraw, setMobileWithdraw] = React.useState(false);
+
+      const onTabChange = (id) => {
+        if (id === 'trade') {
+          setQuickTrade('buy');
+        } else if (id === 'topup') {
+          setMobileTopUp(true);
+        } else {
+          setScreen(id);
+          setAsset(null);
+        }
+      };
+
+      const onAssetTap = (a) => { setAsset(a); };
+      const onTrade = (side, a) => { setTrade({ side, asset: a }); };
+      const onTradeSubmit = (side, a, amt) => {
+        setTrade(null);
+        const sym = a.symbol;
+        const usd = amt.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        setToast(lang === 'ru'
+          ? `${side === 'buy' ? 'Куплено' : 'Продано'} ${sym} на $${usd}`
+          : `${side === 'buy' ? 'Bought' : 'Sold'} ${sym} for $${usd}`);
+        setTimeout(() => setToast(null), 2400);
+      };
+
+      // Pick the home screen variant
+      const HomeComponent = variant === 'v2' ? MobileV2Minimal : variant === 'v3' ? MobileV3Dark : MobileV1Green;
+      const forceDark = variant === 'v3' || dark;
+
+      const screens = {
+        home:     <HomeComponent lang={lang} onProfile={() => { setScreen('profile'); setAsset(null); }} onTrade={side => setQuickTrade(side)} onTopUp={() => setMobileTopUp(true)} onWithdraw={() => setMobileWithdraw(true)}/>,
+        markets:  <MarketsScreen lang={lang} dark={forceDark} onAsset={onAssetTap}/>,
+        assets:   <MobileAssetsView lang={lang} dark={forceDark} onAsset={onAssetTap}/>,
+        history:  <HistoryScreen lang={lang} dark={forceDark}/>,
+        menu:     <MenuScreen lang={lang} dark={forceDark} onProfile={() => { setScreen('profile'); setAsset(null); }}/>,
+        profile:  <ProfileScreen lang={lang} dark={forceDark} onBack={() => setScreen('home')} onLogout={onLogout}/>,
+      };
+
+      const screenView = asset
+        ? <AssetDetailScreen asset={asset} lang={lang} dark={forceDark}
+            onBack={() => setAsset(null)} onTrade={onTrade}/>
+        : (screens[screen] || screens.home);
+
+      const showTabs = !asset && screen !== 'trade' && screen !== 'profile';
+
+      // Active tab indicator: profile shows nothing highlighted; menu screen highlights menu
+      const activeTab = screen === 'home' ? 'home' :
+                        screen === 'markets' ? 'markets' :
+                        screen === 'history' ? 'history' :
+                        screen === 'assets' ? 'assets' : 'home';
+
+      return (
+        <React.Fragment>
+          <IOSDevice width={402} height={874} dark={forceDark}>
+            <div data-screen-label={`Zaman · ${asset ? asset.symbol : screen}`} style={{ position: 'relative', width: '100%', height: '100%' }}>
+              {screenView}
+              {showTabs && <BrokerTabs active={activeTab} onChange={onTabChange} lang={lang} dark={forceDark}/>}
+              {quickTrade && <QuickTradeSheet lang={lang} dark={forceDark} defaultSide={quickTrade}
+                               onClose={() => setQuickTrade(null)}
+                               onPick={a => { setQuickTrade(null); setTrade({ side: quickTrade, asset: a }); }}/>}
+              {trade && <TradeSheet side={trade.side} asset={trade.asset} lang={lang} dark={forceDark}
+                          onClose={() => setTrade(null)} onSubmit={onTradeSubmit}/>}
+              {toast && <TradeToast message={toast} dark={forceDark}/>}
+              {mobileTopUp && (
+                <div style={{ position: 'absolute', inset: 0, zIndex: 90, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                  <div onClick={() => setMobileTopUp(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}/>
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <TopUpSheet lang={lang} dark={forceDark} mobile onClose={() => setMobileTopUp(false)}/>
+                  </div>
+                </div>
+              )}
+              {mobileWithdraw && (
+                <div style={{ position: 'absolute', inset: 0, zIndex: 90, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                  <div onClick={() => setMobileWithdraw(false)} style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)' }}/>
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <WithdrawSheet lang={lang} dark={forceDark} mobile onClose={() => setMobileWithdraw(false)}/>
+                  </div>
+                </div>
+              )}
+            </div>
+          </IOSDevice>
+
+          <TweaksPanel title={lang === 'ru' ? 'Tweaks' : 'Tweaks'}>
+            <TweakSection title={lang === 'ru' ? 'Тема' : 'Theme'}>
+              <TweakRadio
+                value={tweaks.theme}
+                onChange={v => setTweak('theme', v)}
+                options={[
+                  { value: 'light', label: lang === 'ru' ? 'Светлая' : 'Light' },
+                  { value: 'dark',  label: lang === 'ru' ? 'Тёмная'  : 'Dark' },
+                ]}/>
+            </TweakSection>
+            <TweakSection title={lang === 'ru' ? 'Язык' : 'Language'}>
+              <TweakRadio
+                value={tweaks.lang}
+                onChange={v => setTweak('lang', v)}
+                options={[
+                  { value: 'ru', label: 'Русский' },
+                  { value: 'en', label: 'English' },
+                ]}/>
+            </TweakSection>
+            <TweakSection title={lang === 'ru' ? 'Главный экран' : 'Home variant'}>
+              <TweakSelect
+                value={tweaks.variant}
+                onChange={v => setTweak('variant', v)}
+                options={[
+                  { value: 'v1', label: lang === 'ru' ? 'V1 · Зелёный'    : 'V1 · Green hero' },
+                  { value: 'v2', label: lang === 'ru' ? 'V2 · Минимализм' : 'V2 · Minimal' },
+                  { value: 'v3', label: lang === 'ru' ? 'V3 · Тёмная'     : 'V3 · Dark' },
+                ]}/>
+            </TweakSection>
+          </TweaksPanel>
+        </React.Fragment>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<AuthGate><App/></AuthGate>);
+  </script>
+</body>
+</html>

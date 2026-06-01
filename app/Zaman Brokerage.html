@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Zaman Brokerage — design canvas</title>
+<link rel="stylesheet" href="senti/colors_and_type.css">
+<style>
+  html, body { margin: 0; padding: 0; min-height: 100vh; background: #f0eee9; }
+  body { font-family: var(--font-body); color: var(--ink-1000); }
+
+  /* Sticky top header with intro + language toggle */
+  .pageheader {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(240, 238, 233, 0.85);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    padding: 14px 28px;
+    display: flex; align-items: center; gap: 20px;
+  }
+  .pageheader .brand { display: flex; align-items: center; gap: 10px; }
+  .pageheader .brand .logo {
+    width: 30px; height: 30px; border-radius: 9px; background: var(--senti-green);
+    color: #fff; display: grid; place-items: center;
+    font-family: var(--font-display); font-weight: 700; font-size: 16px;
+  }
+  .pageheader h1 {
+    margin: 0; font-family: var(--font-display); font-weight: 600;
+    font-size: 16px; letter-spacing: -0.02em; color: var(--ink-1000);
+  }
+  .pageheader .sub {
+    font-family: var(--font-mono); font-size: 11px; color: var(--ink-500);
+    text-transform: uppercase; letter-spacing: 0.08em;
+  }
+  .pageheader .spacer { flex: 1; }
+
+  .langswitch {
+    display: inline-flex; background: #fff; border: 1px solid var(--ink-200);
+    border-radius: 999px; padding: 3px;
+  }
+  .langswitch button {
+    background: transparent; border: none; cursor: pointer;
+    padding: 6px 14px; border-radius: 999px;
+    font-family: var(--font-display); font-weight: 600; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-500);
+    transition: all 140ms;
+  }
+  .langswitch button.on { background: var(--ink-1000); color: #fff; }
+
+  .toplinks { display: flex; gap: 8px; }
+  .toplinks a {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ink-1000); color: #fff;
+    text-decoration: none; padding: 8px 14px; border-radius: 999px;
+    font-family: var(--font-display); font-weight: 600; font-size: 12px;
+    letter-spacing: -0.1px;
+  }
+  .toplinks a.alt { background: #fff; color: var(--ink-1000); border: 1px solid var(--ink-200); }
+  .toplinks a:hover { transform: translateY(-1px); transition: transform 140ms; }
+
+  #root { padding-bottom: 64px; }
+</style>
+</head>
+<body>
+  <header class="pageheader">
+    <div class="brand">
+      <div class="logo">S</div>
+      <div>
+        <h1>Zaman Brokerage · KG</h1>
+        <div class="sub">Hi-fi · 3 variations · RU/EN</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="toplinks">
+      <a href="Mobile Prototype.html" class="alt">📱 Mobile prototype →</a>
+      <a href="Web Prototype.html">🖥 Web prototype →</a>
+    </div>
+    <div class="langswitch" id="langswitch">
+      <button data-lang="ru" class="on">RU</button>
+      <button data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+  <script type="text/babel" src="senti/design-canvas.jsx"></script>
+  <script type="text/babel" src="senti/ios-frame.jsx"></script>
+  <script type="text/babel" src="senti/brokerage-atoms.jsx"></script>
+  <script type="text/babel" src="senti/mobile-variations.jsx"></script>
+  <script type="text/babel" src="senti/mobile-extra-screens.jsx"></script>
+  <script type="text/babel" src="senti/web-variations.jsx"></script>
+
+  <script type="text/babel">
+    function PhoneShell({ children, dark = false }) {
+      // Wrap a mobile screen in an iOS device frame. iOS device is 402×874 by default;
+      // size the artboard to match.
+      return (
+        <IOSDevice width={402} height={874} dark={dark}>
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            {children}
+          </div>
+        </IOSDevice>
+      );
+    }
+
+    function CanvasApp() {
+      const [lang, setLang] = React.useState('ru');
+
+      React.useEffect(() => {
+        const btns = document.querySelectorAll('#langswitch button');
+        btns.forEach(b => {
+          b.onclick = () => setLang(b.dataset.lang);
+          b.classList.toggle('on', b.dataset.lang === lang);
+        });
+      }, [lang]);
+
+      return (
+        <DesignCanvas>
+          <DCSection id="mobile" title={lang === 'ru' ? '📱 Мобильный портфель' : '📱 Mobile portfolio'} subtitle={lang === 'ru' ? '3 варианта главного экрана для новичка: купить, продать, обменять — и видеть портфель целиком.' : 'Three home-screen variants for a first-time investor: buy, sell, swap — and see the whole portfolio at a glance.'}>
+            <DCArtboard id="m1" label={lang === 'ru' ? 'V1 · Зелёный hero' : 'V1 · Green hero'} width={402} height={874}>
+              <PhoneShell><MobileV1Green lang={lang}/></PhoneShell>
+            </DCArtboard>
+            <DCArtboard id="m2" label={lang === 'ru' ? 'V2 · Минимализм' : 'V2 · Minimal'} width={402} height={874}>
+              <PhoneShell><MobileV2Minimal lang={lang}/></PhoneShell>
+            </DCArtboard>
+            <DCArtboard id="m3" label={lang === 'ru' ? 'V3 · Тёмная тема' : 'V3 · Dark'} width={402} height={874}>
+              <PhoneShell dark><MobileV3Dark lang={lang}/></PhoneShell>
+            </DCArtboard>
+          </DCSection>
+
+          <DCSection id="web" title={lang === 'ru' ? '🖥 Веб личный кабинет' : '🖥 Web dashboard'} subtitle={lang === 'ru' ? 'Три варианта дашборда: тот же портфель — теперь с просторной разметкой, графиком на весь экран и боковой панелью новостей.' : 'Three desktop layouts of the same portfolio — full-bleed chart, holdings table, news, and the daily insight.'}>
+            <DCArtboard id="w1" label={lang === 'ru' ? 'V1 · Зелёный hero' : 'V1 · Green hero'} width={1440} height={900}>
+              <WebV1Green lang={lang} setLang={setLang}/>
+            </DCArtboard>
+            <DCArtboard id="w2" label={lang === 'ru' ? 'V2 · Минимализм' : 'V2 · Minimal'} width={1440} height={900}>
+              <WebV2Minimal lang={lang} setLang={setLang}/>
+            </DCArtboard>
+            <DCArtboard id="w3" label={lang === 'ru' ? 'V3 · Тёмная тема' : 'V3 · Dark'} width={1440} height={900}>
+              <WebV3Dark lang={lang} setLang={setLang}/>
+            </DCArtboard>
+          </DCSection>
+
+          <DCPostIt top={210} left={32} rotate={-3} width={210}>
+            <strong>RU + EN</strong><br/>
+            Переключатель сверху меняет язык во всех артбордах одновременно.
+          </DCPostIt>
+
+          <DCPostIt top={210} right={32} rotate={2} width={220}>
+            <strong>Прототипы наверху</strong><br/>
+            «Mobile prototype» и «Web prototype» — кликабельные версии с навигацией и tweaks.
+          </DCPostIt>
+        </DesignCanvas>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<CanvasApp/>);
+  </script>
+</body>
+</html>
