@@ -1563,7 +1563,7 @@ function MobileNewsScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 32px', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {items.map((n, i) => (
-          <div key={i} style={{ background: dark ? SC.ink900 : SC.ink50, borderRadius: 20, border, overflow: 'hidden' }}>
+          <div key={i} style={{ background: dark ? SC.ink900 : SC.ink50, borderRadius: 20, border, overflow: 'hidden', flexShrink: 0 }}>
             <div style={{ height: 100, background: n.gradient, position: 'relative' }}>
               <div style={{ position: 'absolute', bottom: 10, left: 12, display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 999, background: 'rgba(0,0,0,0.45)' }}>
                 <div style={{ width: 6, height: 6, borderRadius: 999, background: tagColors[n.cls] || SC.green }}/>
@@ -1622,7 +1622,7 @@ function MobileIdeasScreen({ lang = 'ru', dark = false, onBack = () => {} }) {
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 32px', display: 'flex', flexDirection: 'column', gap: 14 }}>
         {items.map((idea, i) => (
-          <div key={i} style={{ background: idea.color, borderRadius: 20, overflow: 'hidden', padding: '18px 18px 0' }}>
+          <div key={i} style={{ background: idea.color, borderRadius: 20, overflow: 'hidden', padding: '18px 18px 0', flexShrink: 0 }}>
             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '3px 9px', borderRadius: 999, background: 'rgba(255,255,255,0.10)', marginBottom: 10 }}>
               <div style={{ width: 6, height: 6, borderRadius: 999, background: idea.accent }}/>
               <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{idea.tag}</span>
